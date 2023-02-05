@@ -1,0 +1,55 @@
+arp
+at
+chcp
+dir
+fsutil
+ipconfig
+net
+net config
+net group
+net localgroup
+net share
+net time
+net use
+net user
+net view
+netsh advfirewall
+netstat
+nslookup
+ping
+qprocess
+query
+qwinsta
+reg
+rundll32
+sc
+set
+systeminfo
+tasklist
+time
+tree
+type
+ver
+whoami
+wmic
+wusa
+route
+findstr
+[System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()
+klist
+setspn
+psexec
+nc
+netcat
+powershell
+cmd
+mimikatz
+nanodump.x64
+procdump
+xordump
+outflank-dumpert
+createdump
+Invoke-mimikatz
+mimikatz
+PasswordHashesView
+7z

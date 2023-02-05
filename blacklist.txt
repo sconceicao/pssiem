@@ -1,0 +1,9 @@
+svchost
+box.bravantic
+informan.webhook.office
+52.97.135
+40.101.62
+194.79.67
+CollectGuestLogs
+CompatTelRunner
+CollectGuestLogs.exe
