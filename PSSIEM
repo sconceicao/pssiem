@@ -37,6 +37,8 @@ $LogName = "Microsoft-Windows-Sysmon"
 $server = hostname
 $checklist = (iwr https://raw.githubusercontent.com/sconceicao/pssiem/main/checklist.txt).Content
 $blacklist = (iwr https://raw.githubusercontent.com/sconceicao/pssiem/main/blacklist.txt).Content
+$checklist = $checklist | ConvertFrom-Csv
+$blacklist = $blacklist | ConvertFrom-Csv
 
 $maxRecordId = (Get-WinEvent -Provider $LogName -max 1).RecordID
 
@@ -82,9 +84,9 @@ while ($true)
 
             #RULES
 
-            If(([io.fileinfo]$evt.Image).basename -in $checklist -and ([io.fileinfo]$evt.ParentImage).basename -notin $blacklist) {
+            If(([io.fileinfo]$evt.Image).basename -in $checklist.checklist -and ([io.fileinfo]$evt.ParentImage).basename -notin $blacklist.blacklist) {
                        
-        $sub = ([io.fileinfo]$evt.Image).name
+     
         
 
 	$JSONBody = [PSCustomObject][Ordered]@{
@@ -111,9 +113,9 @@ Invoke-RestMethod @parameters | Out-Null
 
 
 
-        If(([io.fileinfo]$evt.ParentImage).basename -in $checklist -and ([io.fileinfo]$evt.ParentImage).basename -notin $blacklist) {
+        If(([io.fileinfo]$evt.ParentImage).basename -in $checklist.checklist -and ([io.fileinfo]$evt.ParentImage).basename -notin $blacklist.blacklist) {
                        
-        $sub2 = ([io.fileinfo]$evt.Image).name
+        
                        
        
 
@@ -167,9 +169,9 @@ Invoke-RestMethod @parameters | Out-Null
 
             #RULES
 
-            If(([io.fileinfo]$evt.Image).basename -in $checklist -and ([io.fileinfo]$evt.DestinationIp).basename -notlike "*52.9*") {
+            If(([io.fileinfo]$evt.Image).basename -in $checklist.checklist -and ([io.fileinfo]$evt.DestinationIp).basename -notlike "*52.9*") {
                        
-        $sub2 = ([io.fileinfo]$evt.Image).name
+      
                        
        
 
@@ -260,9 +262,9 @@ Invoke-RestMethod @parameters | Out-Null
 
 #RULES
 
-            If(([io.fileinfo]$evt.TargetImage).basename -like "*lsass*" -and ([io.fileinfo]$evt.GrantedAccess).basename -in $checklist -and ([io.fileinfo]$evt.CallTrace).basename -in $checklist) {
+            If(([io.fileinfo]$evt.TargetImage).basename -like "*lsass*" -and ([io.fileinfo]$evt.GrantedAccess).basename -in $checklist.checklist -and ([io.fileinfo]$evt.CallTrace).basename -in $checklist.checklist) {
                        
-        $sub2 = ([io.fileinfo]$evt.SourceImage).name
+     
                        
      
 
@@ -428,7 +430,7 @@ Invoke-RestMethod @parameters | Out-Null
 
             #RULES
 
-            If(([io.fileinfo]$evt.Image).basename -in $checklist -and ([io.fileinfo]$evt.QueryName).basename -notin $blacklist) {
+            If(([io.fileinfo]$evt.Image).basename -in $checklist.checklist -and ([io.fileinfo]$evt.QueryName).basename -notin $blacklist.blacklist) {
                        
         $sub2 = ([io.fileinfo]$evt.Image).name
                        
