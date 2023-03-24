@@ -1,7 +1,6 @@
-﻿$ErrorActionPreference = "SilentlyContinue"
+$ErrorActionPreference = "SilentlyContinue"
 
 Function Parse-Event {
-    # Credit: https://github.com/RamblingCookieMonster/PowerShell/blob/master/Get-WinEventData.ps1
     param(
         [Parameter(ValueFromPipeline=$true)] $Event
     )
@@ -33,14 +32,11 @@ Function Write-Alert ($alerts) {
     write-host "-----"
 }
 
-ipmo "C:\Users\Public\Documents\Functions-PSStoredCredentials.ps1"
-$KeyPath = "C:\Sistemas\Cred\"
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 $LogName = "Microsoft-Windows-Sysmon"
-$server = "DNS-AZURE"
-$checklist = [IO.File]::ReadLines("C:\Users\Public\Documents\checklist.txt") |?{!([string]::IsNullOrWhitespace($_))}
-$blacklist = [IO.File]::ReadLines("C:\Users\Public\Documents\blacklist.txt") |?{!([string]::IsNullOrWhitespace($_))}
+$server = hostname
+$checklist = (iwr https://raw.githubusercontent.com/sconceicao/pssiem/main/checklist.txt).Content
+$blacklist = (iwr https://raw.githubusercontent.com/sconceicao/pssiem/main/blacklist.txt).Content
 
 $maxRecordId = (Get-WinEvent -Provider $LogName -max 1).RecordID
 
@@ -70,12 +66,26 @@ while ($true)
             $outfile = $outfile -join ' | ' | Add-Content C:\Users\Public\Documents\PSSIEM.log
 
 
+
+
+	    $ProcessCreate = "Process Create"
+            $utctime = $evt.UtcTime
+            $CommandLine = $evt.CommandLine
+            $User = $evt.User
+            $ParentCommandLine = $evt.ParentCommandLine
+            $ParentUser = $evt.ParentUser
+
+            $message = Echo "$ProcessCreate, $utctime, CommandLine: $CommandLine, User: $User, ParentCommandLine: $ParentCommandLine, ParentUser: $ParentUser"
+
+
+
+
             #RULES
 
             If(([io.fileinfo]$evt.Image).basename -in $checklist -and ([io.fileinfo]$evt.ParentImage).basename -notin $blacklist) {
                        
         $sub = ([io.fileinfo]$evt.Image).name
-        Send-MailMessage -From sandro.conceicao@bravantic.com -To sandro.conceicao@bravantic.com -Subject "IOC $server $sub"  -Body $evt.Message -SmtpServer smtp.office365.com -Credential (Get-StoredCredential -username sandro.conceicao@bravantic.com) -UseSsl -Port 587
+        
 
 	$JSONBody = [PSCustomObject][Ordered]@{
     "@type"      = "MessageCard"
@@ -83,7 +93,7 @@ while ($true)
     "summary"    = "Incoming Alert from Azure DNS!"
     "themeColor" = '0078D7'
     "title"      = "IOC $server $sub Image"
-    "text"       = $evt.Message
+    "text"       = $message
 }
 
 $TeamMessageBody = ConvertTo-Json $JSONBody -Depth 100
@@ -105,7 +115,7 @@ Invoke-RestMethod @parameters | Out-Null
                        
         $sub2 = ([io.fileinfo]$evt.Image).name
                        
-        #Send-MailMessage -From sandro.conceicao@bravantic.com -To sandro.conceicao@bravantic.com -Subject "IOC $server $sub2"  -Body $evt.Message -SmtpServer smtp.office365.com -Credential (Get-StoredCredential -username sandro.conceicao@bravantic.com) -UseSsl -Port 587
+       
 
 
 $JSONBody = [PSCustomObject][Ordered]@{
@@ -114,7 +124,7 @@ $JSONBody = [PSCustomObject][Ordered]@{
     "summary"    = "Incoming Alert from Azure DNS!"
     "themeColor" = '0078D7'
     "title"      = "IOC $server $sub2 PImage"
-    "text"       = $evt.Message
+    "text"       = $message
 }
 
 $TeamMessageBody = ConvertTo-Json $JSONBody -Depth 100
@@ -157,11 +167,11 @@ Invoke-RestMethod @parameters | Out-Null
 
             #RULES
 
-            If(([io.fileinfo]$evt.Image).basename -in $checklist -and ([io.fileinfo]$evt.DestinationIp).basename -notin $blacklist) {
+            If(([io.fileinfo]$evt.Image).basename -in $checklist -and ([io.fileinfo]$evt.DestinationIp).basename -notlike "*52.9*") {
                        
         $sub2 = ([io.fileinfo]$evt.Image).name
                        
-        #Send-MailMessage -From sandro.conceicao@bravantic.com -To sandro.conceicao@bravantic.com -Subject "IOC $server $sub2"  -Body $evt.Message -SmtpServer smtp.office365.com -Credential (Get-StoredCredential -username sandro.conceicao@bravantic.com) -UseSsl -Port 587
+       
 
 
 $JSONBody = [PSCustomObject][Ordered]@{
@@ -250,12 +260,11 @@ Invoke-RestMethod @parameters | Out-Null
 
 #RULES
 
-            If(([io.fileinfo]$evt.SourceImage).basename -in $checklist -and ([io.fileinfo]$evt.SourceImage).basename -notin $blacklist) {
+            If(([io.fileinfo]$evt.TargetImage).basename -like "*lsass*" -and ([io.fileinfo]$evt.GrantedAccess).basename -in $checklist -and ([io.fileinfo]$evt.CallTrace).basename -in $checklist) {
                        
         $sub2 = ([io.fileinfo]$evt.SourceImage).name
                        
-        #Send-MailMessage -From sandro.conceicao@bravantic.com -To sandro.conceicao@bravantic.com -Subject "IOC $server $sub2"  -Body $evt.Message -SmtpServer smtp.office365.com -Credential (Get-StoredCredential -username sandro.conceicao@bravantic.com) -UseSsl -Port 587
-
+     
 
 $JSONBody = [PSCustomObject][Ordered]@{
     "@type"      = "MessageCard"
@@ -280,11 +289,11 @@ Invoke-RestMethod @parameters | Out-Null
 	}
 
 
-If(([io.fileinfo]$evt.TargetImage).basename -in $checklist -and ([io.fileinfo]$evt.SourceImage).basename -notin $blacklist) {
+If(([io.fileinfo]$evt.TargetImage).basename -like "*lsass*" -and $evt.CallTrace -like "*dbgcore.dll*" -or $evt.CallTrace -like "*dbghelp.dll*") {
                        
         $sub2 = ([io.fileinfo]$evt.TargetImage).name
                        
-        #Send-MailMessage -From sandro.conceicao@bravantic.com -To sandro.conceicao@bravantic.com -Subject "IOC $server $sub2"  -Body $evt.Message -SmtpServer smtp.office365.com -Credential (Get-StoredCredential -username sandro.conceicao@bravantic.com) -UseSsl -Port 587
+     
 
 
 $JSONBody = [PSCustomObject][Ordered]@{
@@ -423,8 +432,7 @@ Invoke-RestMethod @parameters | Out-Null
                        
         $sub2 = ([io.fileinfo]$evt.Image).name
                        
-        #Send-MailMessage -From sandro.conceicao@bravantic.com -To sandro.conceicao@bravantic.com -Subject "IOC $server $sub2"  -Body $evt.Message -SmtpServer smtp.office365.com -Credential (Get-StoredCredential -username sandro.conceicao@bravantic.com) -UseSsl -Port 587
-
+      
 
 $JSONBody = [PSCustomObject][Ordered]@{
     "@type"      = "MessageCard"
