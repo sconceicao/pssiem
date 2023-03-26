@@ -169,7 +169,7 @@ Invoke-RestMethod @parameters | Out-Null
 
             #RULES
 
-            If(([io.fileinfo]$evt.Image).basename -in $checklist.checklist -and ([io.fileinfo]$evt.DestinationIp).basename -notlike "*52.9*") {
+            If(([io.fileinfo]$evt.Image).basename -in $checklist.checklist -and ([io.fileinfo]$evt.DestinationIp).basename -notlike "*52.9*" -and ([io.fileinfo]$evt.DestinationIp).basename -notin $blacklist.blacklist) {
                        
       
                        
