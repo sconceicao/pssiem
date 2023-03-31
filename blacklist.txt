@@ -7,6 +7,7 @@ informan.webhook.office
 194.79.67
 40.99.204
 185.199.108
+212.18.163
 CollectGuestLogs
 CompatTelRunner
 CollectGuestLogs.exe
