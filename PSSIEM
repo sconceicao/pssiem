@@ -92,7 +92,7 @@ while ($true)
 	$JSONBody = [PSCustomObject][Ordered]@{
     "@type"      = "MessageCard"
     "@context"   = "http://schema.org/extensions"
-    "summary"    = "Incoming Alert from Azure DNS!"
+    "summary"    = "Incoming Alert from $server!"
     "themeColor" = '0078D7'
     "title"      = "IOC $server $sub Image"
     "text"       = $message
@@ -123,7 +123,7 @@ Invoke-RestMethod @parameters | Out-Null
 $JSONBody = [PSCustomObject][Ordered]@{
     "@type"      = "MessageCard"
     "@context"   = "http://schema.org/extensions"
-    "summary"    = "Incoming Alert from Azure DNS!"
+    "summary"    = "Incoming Alert from $server!"
     "themeColor" = '0078D7'
     "title"      = "IOC $server $sub2 PImage"
     "text"       = $message
@@ -179,7 +179,7 @@ Invoke-RestMethod @parameters | Out-Null
 $JSONBody = [PSCustomObject][Ordered]@{
     "@type"      = "MessageCard"
     "@context"   = "http://schema.org/extensions"
-    "summary"    = "Incoming Alert from Azure DNS!"
+    "summary"    = "Incoming Alert from $server!"
     "themeColor" = '0078D7'
     "title"      = "IOC $server $sub2 PImage"
     "text"       = $evt.Message
@@ -271,7 +271,7 @@ Invoke-RestMethod @parameters | Out-Null
 $JSONBody = [PSCustomObject][Ordered]@{
     "@type"      = "MessageCard"
     "@context"   = "http://schema.org/extensions"
-    "summary"    = "Incoming Alert from Azure DNS!"
+    "summary"    = "Incoming Alert from $server!"
     "themeColor" = '0078D7'
     "title"      = "IOC $server $sub2 SImage"
     "text"       = $evt.Message
@@ -301,7 +301,7 @@ If(([io.fileinfo]$evt.TargetImage).basename -like "*lsass*" -and $evt.CallTrace 
 $JSONBody = [PSCustomObject][Ordered]@{
     "@type"      = "MessageCard"
     "@context"   = "http://schema.org/extensions"
-    "summary"    = "Incoming Alert from Azure DNS!"
+    "summary"    = "Incoming Alert from $server!"
     "themeColor" = '0078D7'
     "title"      = "IOC $server $sub2 PImage"
     "text"       = $evt.Message
@@ -439,7 +439,7 @@ Invoke-RestMethod @parameters | Out-Null
 $JSONBody = [PSCustomObject][Ordered]@{
     "@type"      = "MessageCard"
     "@context"   = "http://schema.org/extensions"
-    "summary"    = "Incoming Alert from Azure DNS!"
+    "summary"    = "Incoming Alert from $server!"
     "themeColor" = '0078D7'
     "title"      = "IOC $server $sub2 PImage"
     "text"       = $evt.Message
